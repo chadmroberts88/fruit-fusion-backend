@@ -1,17 +1,22 @@
 {
   "name": "fruit-fusion-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "description": "<!-- title: 'AWS NodeJS Example' description: 'This template demonstrates how to deploy a NodeJS function running on AWS Lambda using the traditional Serverless Framework.' layout: Doc framework: v3 platform: AWS language: nodeJS priority: 1 authorLink: 'https://github.com/serverless' authorName: 'Serverless, inc.' authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4' -->",
+  "main": "handler.js",
   "scripts": {
-    "start": "node app.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ejs": "^3.1.8",
-    "express": "^4.18.1",
-    "mysql2": "^2.3.3"
+    "@middy/core": "^3.1.1",
+    "@middy/http-cors": "^3.1.1",
+    "aws-sdk": "^2.1188.0",
+    "dotenv": "^16.0.1",
+    "joi": "^17.6.0",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.21.3",
+    "serverless-mysql": "^1.5.4",
+    "uuid": "^8.3.2"
   }
 }

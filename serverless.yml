@@ -1,0 +1,88 @@
+service: fruit-fusion-backend
+
+frameworkVersion: "3"
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  environment:
+    DB_HOST: ${env:DB_HOST}
+    DB_PORT: ${env:DB_PORT}
+    DB_NAME: ${env:DB_NAME}
+    DB_USER: ${env:DB_USER}
+    DB_PASS: ${env:DB_PASS}
+
+  # vpc:
+  #   securityGroupIds:
+  #     - sg-0f0454d26d3fc7294
+  #   subnetIds:
+  #     - subnet-06d51c92e23550cd2
+  #     - subnet-06fc734deb3eb79eb
+
+functions:
+  createUser:
+    handler: handler.createUser
+    events:
+      - http:
+          path: /user
+          method: put
+          cors: true
+
+  getUser:
+    handler: handler.getUser
+    events:
+      - http:
+          path: /user/{id}
+          method: get
+          cors: true
+
+  updateUser:
+    handler: handler.updateUser
+    events:
+      - http:
+          path: /user/{id}
+          method: patch
+          cors: true
+
+  deleteUser:
+    handler: handler.deleteUser
+    events:
+      - http:
+          path: /user/{id}
+          method: delete
+          cors: true
+
+  getLeaders:
+    handler: handler.getLeaders
+    events:
+      - http:
+          path: /leaders
+          method: get
+          cors: true
+
+  getRank:
+    handler: handler.getRank
+    events:
+      - http:
+          path: /rank/{id}
+          method: get
+          cors: true
+
+  getGame:
+    handler: handler.getGame
+    events:
+      - http:
+          path: /game/{id}
+          method: get
+          cors: true
+
+  updateGame:
+    handler: handler.updateGame
+    events:
+      - http:
+          path: /game/{id}
+          method: patch
+          cors: true

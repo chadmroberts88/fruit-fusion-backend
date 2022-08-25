@@ -95,6 +95,7 @@ exports.createUser = middy(async (event) => {
 exports.getUser = async (event) => {
   await checkForConnection();
   const id = event.pathParameters?.id;
+  console.log(event);
 
   const result = await User(seqConnection).findAll({
     where: {

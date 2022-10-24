@@ -9,19 +9,14 @@ const User = (seqConnection) => {
       allowNull: false,
       unique: true
     },
-    username: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      unique: true
-    },
     email: {
       type: Sequelize.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
     },
-    password: {
+    username: {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: false,
     },
     soundOn: {
       type: Sequelize.BOOLEAN,
@@ -39,10 +34,6 @@ const User = (seqConnection) => {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
-    photoName: {
-      type: Sequelize.STRING,
-      allowNull: true
-    }
   });
 
   return user;

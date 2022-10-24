@@ -1,5 +1,6 @@
 'use strict';
 const { Sequelize } = require('sequelize');
+const { CognitoIdentityProviderClient } = require('@aws-sdk/client-cognito-identity-provider');
 const middy = require('@middy/core');
 const cors = require('@middy/http-cors');
 const User = require('./models/User');
@@ -43,54 +44,48 @@ const checkForConnection = async () => {
   };
 };
 
-exports.createUser = middy(async (event) => {
+exports.createUser = async (event) => {
+  console.log(`EVENT: ${JSON.stringify(event)}`);
+
   await checkForConnection();
-  const data = JSON.parse(event.body);
-  await validateNewUser(data);
+  // await validateNewUser(data);
 
   const result = await seqConnection.transaction(async (trans) => {
     const user = await User(seqConnection).create({
-      email: data.email,
-      password: data.password,
-      username: 'Player' + (Math.floor(Math.random() * 90000) + 10000),
-      soundOn: data.soundOn,
-      darkModeOn: data.darkModeOn,
-      useSwipeOn: data.useSwipeOn,
-      best: data.best
+      id: event.request.userAttributes.sub,
+      email: event.request.userAttributes.email,
+      username: event.request.userAttributes.preferred_username,
+      soundOn: true,
+      darkModeOn: false,
+      useSwipeOn: false,
+      best: 0
     }, {
       transaction: trans
     });
 
     const game = await Game(seqConnection).create({
-      score: data.score,
-      multiplier: data.multiplier,
-      tileCount: data.tileCount,
-      tiles: data.tiles,
+      score: 0,
+      multiplier: 1,
+      tileCount: 2,
+      tiles: [],
       userId: user.id
     }, {
       transaction: trans
     });
 
     const result = {
-      user: user,
-      game: {
-        score: game.score,
-        multipler: game.multiplier,
-        tileCount: game.tileCount,
-        tiles: game.tiles
-      }
+      ...user,
+      ...game,
     };
 
     return result;
   });
 
   await seqConnection.connectionManager.close();
+  console.log(event);
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify(result)
-  };
-}).use(cors());
+  return event;
+};
 
 exports.getUser = async (event) => {
   await checkForConnection();
@@ -107,6 +102,11 @@ exports.getUser = async (event) => {
 
   return {
     statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "*"
+    },
     body: JSON.stringify(result[0])
   };
 };
@@ -116,7 +116,7 @@ exports.updateUser = async (event) => {
   const id = event.pathParameters?.id;
   const data = JSON.parse(event.body);
 
-  await User(seqConnection).update({
+  const result = await User(seqConnection).update({
     ...data
   }, {
     where: {
@@ -128,7 +128,12 @@ exports.updateUser = async (event) => {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: "User updated." })
+    headers: {
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "*"
+    },
+    body: JSON.stringify(result[0])
   };
 };
 
@@ -188,6 +193,11 @@ exports.getLeaders = async (event) => {
 
   return {
     statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "*"
+    },
     body: JSON.stringify(leaders)
   };
 };
@@ -211,7 +221,12 @@ exports.getRank = async (event) => {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ rank: rank })
+    headers: {
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "*"
+    },
+    body: JSON.stringify(rank)
   };
 };
 
@@ -229,6 +244,11 @@ exports.getGame = async (event) => {
 
   return {
     statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "*"
+    },
     body: JSON.stringify({
       score: result[0].score,
       multiplier: result[0].multiplier,

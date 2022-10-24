@@ -14,6 +14,8 @@ provider:
     DB_NAME: ${env:DB_NAME}
     DB_USER: ${env:DB_USER}
     DB_PASS: ${env:DB_PASS}
+    USERPOOLID: ${env:USERPOOLID}
+    REGION: ${env:REGION}
 
 functions:
   createUser:

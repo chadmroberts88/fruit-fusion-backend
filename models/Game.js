@@ -3,9 +3,9 @@ const { Sequelize } = require('sequelize');
 const Game = (seqConnection) => {
   const game = seqConnection.define('Game', {
     id: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.UUID,
+      defaultValue: Sequelize.UUIDV4,
       primaryKey: true,
-      autoIncrement: true,
       allowNull: false,
       unique: true
     },

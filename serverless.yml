@@ -16,6 +16,9 @@ provider:
     DB_PASS: ${env:DB_PASS}
     USERPOOLID: ${env:USERPOOLID}
     REGION: ${env:REGION}
+  apiGateway:
+    apiKeys:
+      - ${env:API_KEY}
 
 functions:
   createUser:
@@ -24,6 +27,7 @@ functions:
       - http:
           path: /user
           method: put
+          private: true
           cors: true
 
   getUser:
@@ -32,6 +36,7 @@ functions:
       - http:
           path: /user/{id}
           method: get
+          private: true
           cors: true
 
   updateUser:
@@ -40,14 +45,7 @@ functions:
       - http:
           path: /user/{id}
           method: patch
-          cors: true
-
-  deleteUser:
-    handler: handler.deleteUser
-    events:
-      - http:
-          path: /user/{id}
-          method: delete
+          private: true
           cors: true
 
   getLeaders:
@@ -56,6 +54,7 @@ functions:
       - http:
           path: /leaders
           method: get
+          private: true
           cors: true
 
   getRank:
@@ -64,6 +63,7 @@ functions:
       - http:
           path: /rank/{id}
           method: get
+          private: true
           cors: true
 
   getGame:
@@ -72,6 +72,7 @@ functions:
       - http:
           path: /game/{id}
           method: get
+          private: true
           cors: true
 
   updateGame:
@@ -80,6 +81,7 @@ functions:
       - http:
           path: /game/{id}
           method: patch
+          private: true
           cors: true
 
 plugins:

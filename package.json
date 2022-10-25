@@ -9,14 +9,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.194.0",
     "@middy/core": "^3.1.1",
     "@middy/http-cors": "^3.1.1",
     "aws-sdk": "^2.1188.0",
     "dotenv": "^16.0.1",
     "joi": "^17.6.0",
     "mysql2": "^2.3.3",
-    "node-fetch": "^3.2.10",
     "sequelize": "^6.21.3",
     "serverless-mysql": "^1.5.4",
     "uuid": "^8.3.2"

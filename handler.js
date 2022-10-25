@@ -1,11 +1,7 @@
 'use strict';
 const { Sequelize } = require('sequelize');
-const { CognitoIdentityProviderClient } = require('@aws-sdk/client-cognito-identity-provider');
-const middy = require('@middy/core');
-const cors = require('@middy/http-cors');
 const User = require('./models/User');
 const Game = require('./models/Game');
-const validateNewUser = require('./schema/NewUser');
 
 let seqConnection = null;
 
@@ -48,7 +44,6 @@ exports.createUser = async (event) => {
   console.log(`EVENT: ${JSON.stringify(event)}`);
 
   await checkForConnection();
-  // await validateNewUser(data);
 
   const result = await seqConnection.transaction(async (trans) => {
     const user = await User(seqConnection).create({
@@ -134,36 +129,6 @@ exports.updateUser = async (event) => {
       "Access-Control-Allow-Methods": "*"
     },
     body: JSON.stringify(result[0])
-  };
-};
-
-exports.deleteUser = async (event) => {
-  await checkForConnection();
-  const id = event.pathParameters?.id;
-
-  await seqConnection.transaction(async (trans) => {
-    await Game(seqConnection).destroy({
-      where: {
-        userId: id
-      }
-    }, {
-      transaction: trans
-    });
-
-    await User(seqConnection).destroy({
-      where: {
-        id: id
-      }
-    }, {
-      transaction: trans
-    });
-  });
-
-  await seqConnection.connectionManager.close();
-
-  return {
-    statusCode: 204,
-    body: ''
   };
 };
 
@@ -263,7 +228,7 @@ exports.updateGame = async (event) => {
   const id = event.pathParameters?.id;
   const data = JSON.parse(event.body);
 
-  await Game(seqConnection).update({
+  const result = await Game(seqConnection).update({
     ...data
   }, {
     where: {
@@ -275,6 +240,11 @@ exports.updateGame = async (event) => {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: "Game updated!" })
+    headers: {
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "*"
+    },
+    body: JSON.stringify(result[0])
   };
 };

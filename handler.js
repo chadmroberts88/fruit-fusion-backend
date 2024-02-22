@@ -1,7 +1,7 @@
-'use strict';
-const { Sequelize } = require('sequelize');
-const User = require('./models/User');
-const Game = require('./models/Game');
+"use strict";
+const { Sequelize } = require("sequelize");
+const User = require("./models/User");
+const Game = require("./models/Game");
 
 let seqConnection = null;
 
@@ -9,21 +9,16 @@ const createConnection = async () => {
   const seqConnection = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
-    process.env.DB_PASS, {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    dialect: 'mysql',
-    define: {
-      timestamps: false
-    },
-    pool: {
-      max: 5,
-      min: 0,
-      idle: 0,
-      acquire: 3000,
-      evict: 5000
+    process.env.DB_PASS,
+    {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      dialect: "postgres",
+      define: {
+        timestamps: false,
+      },
     }
-  });
+  );
 
   await seqConnection.authenticate();
   return seqConnection;
@@ -37,7 +32,7 @@ const checkForConnection = async () => {
     if (seqConnection.connectionManager.hasOwnProperty("getConnection")) {
       delete seqConnection.connectionManager.getConnection;
     }
-  };
+  }
 };
 
 exports.createUser = async (event) => {
@@ -46,27 +41,33 @@ exports.createUser = async (event) => {
   await checkForConnection();
 
   const result = await seqConnection.transaction(async (trans) => {
-    const user = await User(seqConnection).create({
-      id: event.request.userAttributes.sub,
-      email: event.request.userAttributes.email,
-      username: event.request.userAttributes.preferred_username,
-      soundOn: true,
-      darkModeOn: false,
-      useSwipeOn: false,
-      best: 0
-    }, {
-      transaction: trans
-    });
+    const user = await User(seqConnection).create(
+      {
+        id: event.request.userAttributes.sub,
+        email: event.request.userAttributes.email,
+        username: event.request.userAttributes.preferred_username,
+        soundOn: true,
+        darkModeOn: false,
+        useSwipeOn: false,
+        best: 0,
+      },
+      {
+        transaction: trans,
+      }
+    );
 
-    const game = await Game(seqConnection).create({
-      score: 0,
-      multiplier: 1,
-      tileCount: 2,
-      tiles: [],
-      userId: user.id
-    }, {
-      transaction: trans
-    });
+    const game = await Game(seqConnection).create(
+      {
+        score: 0,
+        multiplier: 1,
+        tileCount: 2,
+        tiles: [],
+        userId: user.id,
+      },
+      {
+        transaction: trans,
+      }
+    );
 
     const result = {
       ...user,
@@ -89,8 +90,8 @@ exports.getUser = async (event) => {
 
   const result = await User(seqConnection).findAll({
     where: {
-      id: id
-    }
+      id: id,
+    },
   });
 
   await seqConnection.connectionManager.close();
@@ -100,9 +101,9 @@ exports.getUser = async (event) => {
     headers: {
       "Access-Control-Allow-Headers": "*",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "*"
+      "Access-Control-Allow-Methods": "*",
     },
-    body: JSON.stringify(result[0])
+    body: JSON.stringify(result[0]),
   };
 };
 
@@ -111,13 +112,16 @@ exports.updateUser = async (event) => {
   const id = event.pathParameters?.id;
   const data = JSON.parse(event.body);
 
-  const result = await User(seqConnection).update({
-    ...data
-  }, {
-    where: {
-      id: id
+  const result = await User(seqConnection).update(
+    {
+      ...data,
+    },
+    {
+      where: {
+        id: id,
+      },
     }
-  });
+  );
 
   await seqConnection.connectionManager.close();
 
@@ -126,9 +130,9 @@ exports.updateUser = async (event) => {
     headers: {
       "Access-Control-Allow-Headers": "*",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "*"
+      "Access-Control-Allow-Methods": "*",
     },
-    body: JSON.stringify(result[0])
+    body: JSON.stringify(result[0]),
   };
 };
 
@@ -141,16 +145,19 @@ exports.getLeaders = async (event) => {
   const offset = (page - 1) * limit;
 
   const { count, rows } = await User(seqConnection).findAndCountAll({
-    attributes: ['username', 'best'],
-    order: [['best', 'DESC'], ['username', 'ASC']],
+    attributes: ["username", "best"],
+    order: [
+      ["best", "DESC"],
+      ["username", "ASC"],
+    ],
     offset: offset,
-    limit: limit
+    limit: limit,
   });
 
   const leaders = rows.map((object) => {
     return {
       username: object.username,
-      best: object.best
+      best: object.best,
     };
   });
 
@@ -161,9 +168,9 @@ exports.getLeaders = async (event) => {
     headers: {
       "Access-Control-Allow-Headers": "*",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "*"
+      "Access-Control-Allow-Methods": "*",
     },
-    body: JSON.stringify(leaders)
+    body: JSON.stringify(leaders),
   };
 };
 
@@ -172,8 +179,11 @@ exports.getRank = async (event) => {
   const id = event.pathParameters?.id;
 
   const result = await User(seqConnection).findAll({
-    attributes: ['id'],
-    order: [['best', 'DESC'], ['username', 'ASC']]
+    attributes: ["id"],
+    order: [
+      ["best", "DESC"],
+      ["username", "ASC"],
+    ],
   });
 
   const list = result.map((object) => {
@@ -189,9 +199,9 @@ exports.getRank = async (event) => {
     headers: {
       "Access-Control-Allow-Headers": "*",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "*"
+      "Access-Control-Allow-Methods": "*",
     },
-    body: JSON.stringify(rank)
+    body: JSON.stringify(rank),
   };
 };
 
@@ -201,8 +211,8 @@ exports.getGame = async (event) => {
 
   const result = await Game(seqConnection).findAll({
     where: {
-      userId: id
-    }
+      userId: id,
+    },
   });
 
   await seqConnection.connectionManager.close();
@@ -212,14 +222,14 @@ exports.getGame = async (event) => {
     headers: {
       "Access-Control-Allow-Headers": "*",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "*"
+      "Access-Control-Allow-Methods": "*",
     },
     body: JSON.stringify({
       score: result[0].score,
       multiplier: result[0].multiplier,
       tileCount: result[0].tileCount,
-      tiles: JSON.parse(result[0].tiles)
-    })
+      tiles: JSON.parse(result[0].tiles),
+    }),
   };
 };
 
@@ -228,13 +238,16 @@ exports.updateGame = async (event) => {
   const id = event.pathParameters?.id;
   const data = JSON.parse(event.body);
 
-  const result = await Game(seqConnection).update({
-    ...data
-  }, {
-    where: {
-      userId: id
+  const result = await Game(seqConnection).update(
+    {
+      ...data,
+    },
+    {
+      where: {
+        userId: id,
+      },
     }
-  });
+  );
 
   await seqConnection.connectionManager.close();
 
@@ -243,8 +256,8 @@ exports.updateGame = async (event) => {
     headers: {
       "Access-Control-Allow-Headers": "*",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "*"
+      "Access-Control-Allow-Methods": "*",
     },
-    body: JSON.stringify(result[0])
+    body: JSON.stringify(result[0]),
   };
 };

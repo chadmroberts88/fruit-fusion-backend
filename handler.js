@@ -78,21 +78,17 @@ exports.createUser = async (event) => {
   });
 
   await seqConnection.connectionManager.close();
-  console.log(event);
 
   return event;
 };
 
 exports.getUser = async (event) => {
-  await checkForConnection();
-  const id = event.pathParameters?.id;
-  console.log(event);
+  console.log(`EVENT: ${JSON.stringify(event)}`);
 
-  const result = await User(seqConnection).findAll({
-    where: {
-      id: id,
-    },
-  });
+  await checkForConnection();
+
+  const id = event.pathParameters?.id;
+  const result = await User(seqConnection).findAll({ where: { id: id } });
 
   await seqConnection.connectionManager.close();
 
@@ -103,24 +99,20 @@ exports.getUser = async (event) => {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "*",
     },
-    body: JSON.stringify(result[0]),
+    body: JSON.stringify(result[0].dataValues),
   };
 };
 
 exports.updateUser = async (event) => {
+  console.log(`EVENT: ${JSON.stringify(event)}`);
+
   await checkForConnection();
+
   const id = event.pathParameters?.id;
   const data = JSON.parse(event.body);
-
   const result = await User(seqConnection).update(
-    {
-      ...data,
-    },
-    {
-      where: {
-        id: id,
-      },
-    }
+    { ...data },
+    { where: { id: id } }
   );
 
   await seqConnection.connectionManager.close();
@@ -136,28 +128,23 @@ exports.updateUser = async (event) => {
   };
 };
 
-// /leaders?page=1&limit=10
-
 exports.getLeaders = async (event) => {
-  await checkForConnection();
-  const page = parseInt(event.queryStringParameters?.page);
-  const limit = parseInt(event.queryStringParameters?.limit);
-  const offset = (page - 1) * limit;
+  console.log(`EVENT: ${JSON.stringify(event)}`);
 
-  const { count, rows } = await User(seqConnection).findAndCountAll({
+  await checkForConnection();
+
+  const { rows } = await User(seqConnection).findAndCountAll({
     attributes: ["username", "best"],
     order: [
       ["best", "DESC"],
       ["username", "ASC"],
     ],
-    offset: offset,
-    limit: limit,
   });
 
-  const leaders = rows.map((object) => {
+  const leaders = rows.map((user) => {
     return {
-      username: object.username,
-      best: object.best,
+      username: user.dataValues.username,
+      best: user.dataValues.best,
     };
   });
 
@@ -175,9 +162,11 @@ exports.getLeaders = async (event) => {
 };
 
 exports.getRank = async (event) => {
-  await checkForConnection();
-  const id = event.pathParameters?.id;
+  console.log(`EVENT: ${JSON.stringify(event)}`);
 
+  await checkForConnection();
+
+  const id = event.pathParameters?.id;
   const result = await User(seqConnection).findAll({
     attributes: ["id"],
     order: [
@@ -186,8 +175,8 @@ exports.getRank = async (event) => {
     ],
   });
 
-  const list = result.map((object) => {
-    return object.id;
+  const list = result.map((user) => {
+    return user.dataValues.id;
   });
 
   const rank = list.indexOf(id) + 1;
@@ -206,14 +195,13 @@ exports.getRank = async (event) => {
 };
 
 exports.getGame = async (event) => {
-  await checkForConnection();
-  const id = event.pathParameters?.id;
+  console.log(`EVENT: ${JSON.stringify(event)}`);
 
-  const result = await Game(seqConnection).findAll({
-    where: {
-      userId: id,
-    },
-  });
+  await checkForConnection();
+
+  const id = event.pathParameters?.id;
+  const result = await Game(seqConnection).findAll({ where: { userId: id } });
+  const data = result[0].dataValues;
 
   await seqConnection.connectionManager.close();
 
@@ -225,28 +213,24 @@ exports.getGame = async (event) => {
       "Access-Control-Allow-Methods": "*",
     },
     body: JSON.stringify({
-      score: result[0].score,
-      multiplier: result[0].multiplier,
-      tileCount: result[0].tileCount,
-      tiles: JSON.parse(result[0].tiles),
+      score: data.score,
+      multiplier: data.multiplier,
+      tileCount: data.tileCount,
+      tiles: data.tiles,
     }),
   };
 };
 
 exports.updateGame = async (event) => {
+  console.log(`EVENT: ${JSON.stringify(event)}`);
+
   await checkForConnection();
+
   const id = event.pathParameters?.id;
   const data = JSON.parse(event.body);
-
   const result = await Game(seqConnection).update(
-    {
-      ...data,
-    },
-    {
-      where: {
-        userId: id,
-      },
-    }
+    { ...data },
+    { where: { userId: id } }
   );
 
   await seqConnection.connectionManager.close();

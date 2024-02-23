@@ -1,27 +1,17 @@
 {
   "name": "fruit-fusion-backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Fruit Fusion Backend",
   "main": "handler.js",
-  "scripts": {
-    "test": "jest"
-  },
+  "scripts": {},
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@middy/core": "^3.1.1",
-    "@middy/http-cors": "^3.1.1",
-    "aws-sdk": "^2.1188.0",
-    "dotenv": "^16.0.1",
-    "joi": "^17.6.0",
-    "mysql2": "^2.3.3",
     "pg": "^8.11.3",
-    "sequelize": "^6.21.3",
-    "serverless-mysql": "^1.5.4",
-    "uuid": "^8.3.2"
+    "sequelize": "^6.21.3"
   },
   "devDependencies": {
-    "jest": "^29.0.0",
+    "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^9.2.6"
   }
 }

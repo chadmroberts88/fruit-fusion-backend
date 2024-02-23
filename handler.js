@@ -245,3 +245,22 @@ exports.updateGame = async (event) => {
     body: JSON.stringify(result[0]),
   };
 };
+
+// Resets the demo account game weekly to prevent the database from sleeping.
+
+exports.resetDemoGame = async (event) => {
+  console.log(`EVENT: ${JSON.stringify(event)}`);
+
+  await checkForConnection();
+
+  // Demo Account ID
+  const id = process.env.DEMO_ID;
+  const result = await Game(seqConnection).update(
+    { score: 0, multiplier: 1, tileCount: 2, tiles: [] },
+    { where: { userId: id } }
+  );
+
+  await seqConnection.connectionManager.close();
+
+  return;
+};

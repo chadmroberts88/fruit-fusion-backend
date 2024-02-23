@@ -6,7 +6,7 @@ useDotenv: true
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs20.x
   region: us-east-1
   environment:
     DB_HOST: ${env:DB_HOST}
@@ -83,6 +83,11 @@ functions:
           method: patch
           private: true
           cors: true
+
+  resetDemoGame:
+    handler: handler.resetDemoGame
+    events:
+      - schedule: cron(0 0 ? * SUN *)
 
 plugins:
   - serverless-dotenv-plugin
